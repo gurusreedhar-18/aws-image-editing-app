@@ -191,21 +191,16 @@ def prepare_titan_request(body: dict) -> dict:
     base_image = strip_data_url(body["base_image"])
     mask_image = strip_data_url(body.get("mask", "")) if body.get("mask") else None
 
-    # Get actual image dimensions (or use defaults if unable to detect)
-    dimensions = get_image_dimensions(base_image)
-    if dimensions:
-        width, height = dimensions
-    else:
-        width, height = 512, 512
-        logger.warning("Using default dimensions 512x512")
-    
-    logger.info(f"Using dimensions: {width}x{height} for Titan request")
+    # Log base64 length for debugging
+    logger.info(f"Base image base64 length: {len(base_image)}")
+    if mask_image:
+        logger.info(f"Mask image base64 length: {len(mask_image)}")
 
     # --- Image generation config (shared) ---
+    # NOTE: For INPAINTING/OUTPAINTING, Titan uses the input image dimensions
+    # We only specify numberOfImages and cfgScale
     image_generation_config = {
         "numberOfImages": int(body.get("numberOfImages", 1)),
-        "height": height,
-        "width": width,
         "cfgScale": float(body.get("cfgScale", 8.0)),
     }
 
