@@ -90,8 +90,14 @@ def log_to_dynamodb(
         logger.error(f"Failed to log to DynamoDB: {str(e)}")
 
 def prepare_titan_request(prompt_content, painting_mode, mask_base64, image_base64):
+    # Resolve the actual Titan taskType
+    if painting_mode in ('OUTPAINTING', 'precise-outpaint'):
+        task_type = 'OUTPAINTING'
+    else:
+        task_type = 'INPAINTING'
+
     image_generation_config = {
-        "taskType": painting_mode,
+        "taskType": task_type,
         "imageGenerationConfig": {
             "numberOfImages": 2,
             "quality": "premium",
@@ -136,7 +142,7 @@ def lambda_handler(event, context):
             return {
                 'statusCode': 400,
                 'headers': get_cors_headers(),
-                'body': json.dumps({'error': 'Missing body in request'})
+                'body': json.dumps({'error': 'Missing body in request', 'images': []})
             }
 
         if isinstance(event['body'], dict):
@@ -148,7 +154,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 400,
             'headers': get_cors_headers(),
-            'body': json.dumps({'error': f'Invalid request body: {str(e)}'})
+            'body': json.dumps({'error': f'Invalid request body: {str(e)}', 'images': []})
         }
 
     # -------------------------------
@@ -165,7 +171,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 400,
             'headers': get_cors_headers(),
-            'body': json.dumps({'error': f'Missing or invalid parameters: {str(e)}'})
+            'body': json.dumps({'error': f'Missing or invalid parameters: {str(e)}', 'images': []})
         }
 
     model = body.get('model', 'titan').lower()
@@ -190,7 +196,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 400,
             'headers': get_cors_headers(),
-            'body': json.dumps({'error': error_msg})
+            'body': json.dumps({'error': error_msg, 'images': []})
         }
 
     # -------------------------------
@@ -208,7 +214,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 400,
             'headers': get_cors_headers(),
-            'body': json.dumps({'error': f'Error preparing request: {str(e)}'})
+            'body': json.dumps({'error': f'Error preparing request: {str(e)}', 'images': []})
         }
 
     # -------------------------------
@@ -276,6 +282,7 @@ def lambda_handler(event, context):
             'headers': get_cors_headers(),
             'body': json.dumps({
                 'error': error_message,
-                'request_id': request_id
+                'request_id': request_id,
+                'images': []
             })
         }
