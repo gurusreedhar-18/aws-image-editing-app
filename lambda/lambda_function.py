@@ -26,6 +26,9 @@ from botocore.exceptions import ClientError
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# IMPORTANT: Titan Image Generator v2 is only available in specific regions
+# Supported regions: us-east-1, us-west-2, eu-west-1, ap-southeast-1, ap-northeast-1
+# NOT supported in: ap-south-2 (Hyderabad)
 BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-east-1")
 MODEL_ID = os.environ.get("MODEL_ID", "amazon.titan-image-generator-v2:0")
 
