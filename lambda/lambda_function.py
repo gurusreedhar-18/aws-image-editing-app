@@ -100,6 +100,62 @@ def strip_data_url(data: str) -> str:
     return data
 
 
+# ─── Get image dimensions from base64 ────────────────────────────────────────
+def get_image_dimensions(base64_data: str) -> tuple:
+    """
+    Decode base64 image and get its dimensions from PNG/JPEG headers.
+    Returns (width, height) or None if unable to determine.
+    """
+    try:
+        import struct
+        
+        # Decode base64 to bytes
+        image_bytes = base64.b64decode(base64_data)
+        
+        # Check PNG signature
+        if image_bytes[:8] == b'\x89PNG\r\n\x1a\n':
+            # PNG: width and height are at bytes 16-24 in IHDR chunk
+            width = struct.unpack('>I', image_bytes[16:20])[0]
+            height = struct.unpack('>I', image_bytes[20:24])[0]
+        # Check JPEG signature
+        elif image_bytes[:2] == b'\xff\xd8':
+            # JPEG: need to find SOF0 marker
+            i = 2
+            while i < len(image_bytes) - 9:
+                if image_bytes[i] == 0xFF:
+                    marker = image_bytes[i + 1]
+                    if marker in (0xC0, 0xC1, 0xC2):  # SOF markers
+                        height = struct.unpack('>H', image_bytes[i + 5:i + 7])[0]
+                        width = struct.unpack('>H', image_bytes[i + 7:i + 9])[0]
+                        break
+                    elif marker == 0xD9:  # EOI
+                        break
+                    else:
+                        # Skip to next marker
+                        length = struct.unpack('>H', image_bytes[i + 2:i + 4])[0]
+                        i += 2 + length
+                else:
+                    i += 1
+            else:
+                return None
+        else:
+            logger.warning("Unknown image format")
+            return None
+        
+        # Titan requires dimensions to be multiples of 64 and within limits
+        # Min: 256, Max: 1408
+        orig_width, orig_height = width, height
+        width = max(256, min(1408, (width // 64) * 64))
+        height = max(256, min(1408, (height // 64) * 64))
+        
+        logger.info(f"Original image: {orig_width}x{orig_height}, adjusted to: {width}x{height}")
+        return (width, height)
+        
+    except Exception as e:
+        logger.warning(f"Could not determine image dimensions: {e}")
+        return None
+
+
 # ─── Build Titan v2 Request Body ────────────────────────────────────────────
 def prepare_titan_request(body: dict) -> dict:
     """
@@ -135,11 +191,21 @@ def prepare_titan_request(body: dict) -> dict:
     base_image = strip_data_url(body["base_image"])
     mask_image = strip_data_url(body.get("mask", "")) if body.get("mask") else None
 
+    # Get actual image dimensions (or use defaults if unable to detect)
+    dimensions = get_image_dimensions(base_image)
+    if dimensions:
+        width, height = dimensions
+    else:
+        width, height = 512, 512
+        logger.warning("Using default dimensions 512x512")
+    
+    logger.info(f"Using dimensions: {width}x{height} for Titan request")
+
     # --- Image generation config (shared) ---
     image_generation_config = {
         "numberOfImages": int(body.get("numberOfImages", 1)),
-        "height": 512,
-        "width": 512,
+        "height": height,
+        "width": width,
         "cfgScale": float(body.get("cfgScale", 8.0)),
     }
 
