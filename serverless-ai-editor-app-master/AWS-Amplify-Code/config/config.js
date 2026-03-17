@@ -1,7 +1,3 @@
-// Yash Academy - AWS Workshop Configuration File
-// Instructor: Yaswanth Reddy Arumulla
-// YouTube: https://www.youtube.com/@Yashacademy0 | LinkedIn: https://www.linkedin.com/in/yaswanth-arumulla/
-//
 // Replace the placeholder values below with your actual AWS resource identifiers
 // 
 // Instructions:
