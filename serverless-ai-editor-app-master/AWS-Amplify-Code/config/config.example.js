@@ -1,4 +1,5 @@
-// Example Configuration File
+// Yash Academy - Example Configuration File
+// Instructor: Yaswanth Reddy Arumulla
 // Copy this to config.js and replace with your actual AWS resource identifiers
 
 window._workshopConfig = {
@@ -13,3 +14,12 @@ window._workshopConfig = {
 };
 
 window._configLoaded = true;
+
+// Yash Academy Branding
+window._YashAcademy = {
+  instructor: 'Yaswanth Reddy Arumulla',
+  academy: 'Yash Academy',
+  youtube: 'https://www.youtube.com/@Yashacademy0',
+  linkedin: 'https://www.linkedin.com/in/yaswanth-arumulla/',
+  website: 'https://medium.com/@yaswanth.arumulla'
+};
