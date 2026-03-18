@@ -4,12 +4,12 @@
 
 window._workshopConfig = {
   cognito: {
-    userPoolId: 'us-west-2_uXboG5pAb', // Replace with your Cognito User Pool ID
-    userPoolClientId: '25ddkmj4v6hfsfvruhpfi7n4hv', // Replace with your Cognito App Client ID
-    region: 'us-west-2' // Replace with your AWS region
+    userPoolId: 'us-east-1_QmeM8lPLh', // Replace with your Cognito User Pool ID
+    userPoolClientId: '4bkt9vu7vhmj02pskp9rg0c6ir', // Replace with your Cognito App Client ID
+    region: 'us-east-1' // Replace with your AWS region
   },
   api: {
-    invokeUrl: 'https://abc123def.execute-api.us-west-2.amazonaws.com/prod' // Replace with your API Gateway URL
+    invokeUrl: 'https://4dcifje4wa.execute-api.us-east-1.amazonaws.com/dev' // Replace with your API Gateway URL
   }
 };
 
