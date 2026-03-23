@@ -23,7 +23,7 @@ window._workshopConfig = {
     region: 'us-east-1' // e.g. us-west-2
   },
   api: {
-    invokeUrl: 'https://4dcifje4wa.execute-api.us-east-1.amazonaws.com/dev' // e.g. https://abc123def.execute-api.us-west-2.amazonaws.com/prod
+    invokeUrl: 'https://tkpyisoqgd.execute-api.us-east-1.amazonaws.com/dev' // e.g. https://abc123def.execute-api.us-west-2.amazonaws.com/prod
   }
 };
 
