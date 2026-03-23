@@ -96,13 +96,12 @@ def prepare_titan_request(prompt_content, painting_mode, mask_base64, image_base
     else:
         task_type = 'INPAINTING'
 
+    # NOTE: For INPAINTING/OUTPAINTING, don't specify height/width
+    # Titan will use the input image dimensions automatically
     image_generation_config = {
         "taskType": task_type,
         "imageGenerationConfig": {
-            "numberOfImages": 2,
-            "quality": "premium",
-            "height": 1024,
-            "width": 1024,
+            "numberOfImages": 1,
             "cfgScale": 8.0,
             "seed": randint(0, 100000)
         }
